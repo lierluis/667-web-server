@@ -58,6 +58,10 @@ class MimeTypes < ConfigFile
     return self
   end
 
+  def for(extension)
+    return @mime_types[extension]
+  end
+
 end
 
 class HttpConfig < ConfigFile
@@ -65,7 +69,9 @@ class HttpConfig < ConfigFile
 
 end
 
+## Here's some code to illustrate how this works!
 configFile=MimeTypes.new(File.open("config/mime.types", "r").read()).load
 configFile.mime_types.each do |k,v|
   print k, " : ",v, "\n"
 end
+puts configFile.for('h261')
