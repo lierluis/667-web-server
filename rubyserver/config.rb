@@ -21,8 +21,10 @@ class ConfigFile
   end
 
   def validLine?(line)
-    if line.start_with? "#" or 
-      line.start_with? "\n"
+    if line.tr(' ', '').start_with? '#' or 
+      line.start_with? "\n" or
+      line.split.length == 0
+
       return false
     end
     return true
