@@ -12,25 +12,24 @@ class ConfigFile
   def load(str)
     parsedData = Hash.new()
     str.each_line do |line|
-      if self.validLine?(line)
-        lineSplit=line.split(' ', 2)
-        parsedData[lineSplit[0]] = self.removeQuotes(lineSplit[1])
+      if self.valid_line?(line)
+        lineSplit=line.split(' ', 2) #split into max two parts
+        parsedData[lineSplit[0]] = self.remove_quotes(lineSplit[1])
       end
     end
     return parsedData
   end
 
-  def validLine?(line)
+  def valid_line?(line)
     if line.tr(' ', '').start_with? '#' or 
       line.start_with? "\n" or
       line.split.length == 0
-
       return false
     end
     return true
   end
 
-  def removeQuotes(str)
+  def remove_quotes(str)
     return str.tr('"',"")
   end
 
@@ -38,7 +37,11 @@ end
 
 
 class MimeTypes < ConfigFile
-  attr_accessor :mime_types
+  attr_reader :mime_types
+
+  def process_lines
+
+  end
 
 end
 
