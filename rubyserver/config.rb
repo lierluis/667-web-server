@@ -4,14 +4,14 @@ class ConfigFile
   attr_reader :lines
 
   def initialize(str)
-    @lines=self.load(str)
+    @lines=str
   end
 
   # Return hash of key value pairs found in the multi-line string,
   # The key and value are separated by the first whitespace found in each line 
-  def load(str)
+  def load()
     parsedData = Hash.new()
-    str.each_line do |line|
+    @lines.each_line do |line|
       if self.valid_line?(line)
         lineSplit=line.split(' ', 2) #split into max two parts
         parsedData[lineSplit[0]] = self.remove_quotes(lineSplit[1])
@@ -39,8 +39,23 @@ end
 class MimeTypes < ConfigFile
   attr_reader :mime_types
 
-  def process_lines
+  # Take the keys from @lines as @mime_type values (valid mime extensions)
+  # Take the values from @lines as @mime_type keys
+  # Split the @lines values into multiple extensions delimited by white space
+  def process_lines(line_hash)
+    @mime_types=Hash.new()
+    line_hash.each do |mime_type, mime_extensions|
+      mime_extensions.split(' ').each do |mime_extension|
+        @mime_types[mime_extension]=mime_type
+      end
+    end
+  end
 
+  # Override load() on superclass and add call to process_lines
+  def load()
+    line_hash=super
+    self.process_lines(line_hash)
+    return self
   end
 
 end
@@ -50,7 +65,7 @@ class HttpConfig < ConfigFile
 
 end
 
-configFile=ConfigFile.new(File.open("config/mime.types", "r").read())
-configFile.lines.each do |k,v|
+configFile=MimeTypes.new(File.open("config/mime.types", "r").read()).load
+configFile.mime_types.each do |k,v|
   print k, " : ",v, "\n"
 end
