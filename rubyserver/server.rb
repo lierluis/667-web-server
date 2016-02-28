@@ -1,14 +1,15 @@
-require 'socket' # allows use of TCPServer & TCPSocket classesH
+require 'socket' # allows use of TCPServer & TCPSocket classes
 require 'thread'
+# require File.join File.dirname(__FILE__), 'config' # access config.rb
 
 #DEFAULT_PORT = 8999
 
-class WebServer
-  attr_reader :options, :socket
+class Webserver
+  attr_reader :options, :socket, :port, :mime_types, :httpd_config
   
   def initialize(options={})
     @options = options
-	
+    
     #Open webserver configuration and mime types
     @httpd = HttpdConf.new(File.open("config/httpd.conf", "r").read())
     #@mimefile = File.open("config/mime.types", "r")
@@ -16,8 +17,8 @@ class WebServer
   
   def start
     @portnumber = @httpd.port
-
-    loop do  
+    
+    loop do
       puts "-----------------------------------------------"
       puts "Opening server socket to listen for connections"
       @socket = server.accept # open socket, wait until client connects
@@ -28,7 +29,7 @@ class WebServer
       
       @socket.close # terminate connection
       
-#	  Thread.new(@socket) do |newsocket| # thread for every session
+#      Thread.new(@socket) do |newsocket| # thread for every session
 #        puts "Received connection\n"
 #        Request.new(newsocket).parse
 #        newsocket.puts Response.new.to_s
@@ -46,46 +47,42 @@ end
 
 # receives a stream in constructor, & parses content into members
 class Request
-  attr_reader :verb, :uri, :query, :version, :headers, :body, :request
+  attr_reader :verb, :uri, :query, :version, :headers, :body, :http_request
   
   def initialize(stream)
-    @request = stream
+    @http_request = stream
   end
   
   def parse
-    request_line = @request.gets
-    print "request line: ", request_line
+    request_line = @http_request.gets.split(" ")
+    puts request_line.join(" ")
     
-    fullpath = request_line.split(" ")
-    path, query = fullpath[1].split("?")
+    path, query = request_line[1].split("?")
     
-    @body    = "body"
-    @verb    = fullpath[0]
-    @uri     = fullpath[1]
+    @verb    = request_line[0]
+    @uri     = request_line[1]
     @query   = query
-    @version = fullpath[2]
+    @version = request_line[2]
     @headers = Hash.new
     
-    has_body = false
-    while (header = @request.gets) != "\r\n"
+    while (header = @http_request.gets) != "\r\n"
       key, value = header.split(": ")
       @headers.store(key, value)
       
       if key == "Content-Length"
         has_body = true
+        content_length = value.to_i
       end
     end
     
     @headers.each do |key, value|
       puts "#{key}: #{value}"
     end
-    puts "#{[header]}" # blank line
+    puts "\r\n" # blank line
     
     if has_body == true
-#      while line = @request.gets
-#        puts "#{[line]}"
-#      end
-#      puts "#{[line]}"
+      @body = @http_request.read(content_length)
+      puts @body
     end
     
   end
@@ -150,4 +147,13 @@ class HttpdConf
     end
   end
 
-WebServer.new.start
+class Htaccess
+  attr_reader :config
+  
+  def auth_user_file
+    
+  end
+end
+
+
+Webserver.new.start

@@ -1,0 +1,4 @@
+AuthUserFile "/home/rubyserver/public/protected"
+AuthType Basic
+AuthName "hi"
+Require valid-user
