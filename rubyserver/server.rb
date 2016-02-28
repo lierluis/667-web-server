@@ -1,6 +1,8 @@
 require 'socket' # allows use of TCPServer & TCPSocket classes
 require 'thread'
-# require File.join File.dirname(__FILE__), 'config' # access config.rb
+# require File.join File.dirname(__FILE__), 'config'
+require File.join File.dirname(__FILE__), 'request'
+require File.join File.dirname(__FILE__), 'response'
 
 #DEFAULT_PORT = 8999
 
@@ -42,76 +44,6 @@ class Webserver
   # TCPServer represents a TCP/IP server socket
   def server
     @server ||= TCPServer.open(options.fetch('localhost', @portnumber))
-  end
-end
-
-# receives a stream in constructor, & parses content into members
-class Request
-  attr_reader :verb, :uri, :query, :version, :headers, :body, :http_request
-  
-  def initialize(stream)
-    @http_request = stream
-  end
-  
-  def parse
-    request_line = @http_request.gets.split(" ")
-    puts request_line.join(" ")
-    
-    path, query = request_line[1].split("?")
-    
-    @verb    = request_line[0]
-    @uri     = request_line[1]
-    @query   = query
-    @version = request_line[2]
-    @headers = Hash.new
-    
-    while (header = @http_request.gets) != "\r\n"
-      key, value = header.split(": ")
-      @headers.store(key, value)
-      
-      if key == "Content-Length"
-        has_body = true
-        content_length = value.to_i
-      end
-    end
-    
-    @headers.each do |key, value|
-      puts "#{key}: #{value}"
-    end
-    puts "\r\n" # blank line
-    
-    if has_body == true
-      @body = @http_request.read(content_length)
-      puts @body
-    end
-    
-  end
-end
-
-# generates generic OK response to send to the client
-class Response
-  attr_reader :version, :response_code, :response_phrase, :headers, :body
-  
-  def initialize
-    @body            = "body"
-    @version         = "HTTP/1.1"
-    @response_code   = "200"
-    @response_phrase = "OK"
-    @headers         ={"Content-Type" => "text/plain",
-                       "Content-Length" => "#{@body.bytesize}",
-                       "Connection" => "close"}
-  end
-  
-  def to_s
-    s = "\r\n#{@version} #{@response_code} #{@response_phrase}\r\n"
-
-    @headers.each do |key, value|
-      s += "#{key}: #{value}\r\n"
-    end
-    s += "\r\n" # blank line
-    s += "#{@body}\r\n"
-    
-    return s
   end
 end
 
