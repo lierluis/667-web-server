@@ -166,4 +166,7 @@ end
 # print "Document Root: ", httpd_conf.document_root(),"\n"
 # print "Listen: ", httpd_conf.listen(),"\n"
 # print "Log File: ",httpd_conf.log_file(),"\n"
+<<<<<<< HEAD
 
+=======
+>>>>>>> e4310a1ec3e0c88dbf69a3e84ddf0af7230e640a
