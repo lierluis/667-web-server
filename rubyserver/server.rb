@@ -1,8 +1,9 @@
 require 'socket' # allows use of TCPServer & TCPSocket classes
 require 'thread'
-# require File.join File.dirname(__FILE__), 'config'
+require File.join File.dirname(__FILE__), 'config'
 require File.join File.dirname(__FILE__), 'request'
 require File.join File.dirname(__FILE__), 'response'
+require File.join File.dirname(__FILE__), 'htaccess'
 
 #DEFAULT_PORT = 8999
 
@@ -11,14 +12,12 @@ class Webserver
   
   def initialize(options={})
     @options = options
-    
-    #Open webserver configuration and mime types
-    @httpd = HttpdConf.new(File.open("config/httpd.conf", "r").read())
-    #@mimefile = File.open("config/mime.types", "r")
   end
   
   def start
-    @portnumber = @httpd.port
+    read_config_file()
+    @port = @httpd_config.listen()
+    
     
     loop do
       puts "-----------------------------------------------"
@@ -41,51 +40,15 @@ class Webserver
     end
   end
   
+  def read_config_file
+    @httpd_config = HttpConfig.new(File.open("config/httpd.conf", "r").read())
+    @mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
+  end
+  
   # TCPServer represents a TCP/IP server socket
   def server
-    @server ||= TCPServer.open(options.fetch('localhost', @portnumber))
+    @server ||= TCPServer.open(options.fetch('localhost', @port))
   end
 end
-
-class HttpdConf 
-    def initialize(httpdConfig)
-      @config = httpdConfig.split("\n")
-      @httpdhash = {}
-    end
-    def root
-      @httpdhash[:root] = find("ServerRoot")
-    end
-    def docRoot
-      @httpdhash[:docRoot] = find("DocumentRoot")
-    end
-    def port
-      @httpdhash[:port] = find("Listen").to_i
-    end
-    def log
-      @httpdhash[:log] = find("LogFile")
-    end
-    def errorlog
-      @httpdhash[:errorlog] = find("ErrorLogFile")
-    end
-    def find(resource)
-      keyword = ""
-      @config.each do |line|
-        if line.include? resource
-          keyword = line.split(" ")
-          break
-        end
-      end
-      keyword = keyword[1]
-    end
-  end
-
-class Htaccess
-  attr_reader :config
-  
-  def auth_user_file
-    
-  end
-end
-
 
 Webserver.new.start

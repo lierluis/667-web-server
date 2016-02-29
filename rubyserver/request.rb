@@ -22,21 +22,14 @@ class Request
     while (header = @http_request.gets) != "\r\n"
       key, value = header.split(": ")
       @headers.store(key, value)
-      
-      # if content-length exists, there is a body
-      if key == "Content-Length"
-        has_body = true
-        content_length = value.to_i
-      end
     end
     
-    # print headers, blank line, and body
-    @headers.each do |key, value|
-      puts "#{key}: #{value}"
-    end
+    @headers.map{|key, value| puts "#{key}: #{value}"}
     puts "\r\n" # blank line
-
-    if has_body == true
+    
+    # print body if 'Content-Length' header exists
+    if @headers.has_key?('Content-Length')
+      content_length = @headers.values_at('Content-Length')[0].to_i
       @body = @http_request.read(content_length)
       puts @body
     end
