@@ -81,7 +81,7 @@ class HttpConfig < ConfigFile
       end
     end
   end
-  
+
   #TODO: implement exception throwing when attributes aren't found in accessors
   def server_root()
     if(!@config.has_key?('ServerRoot'))
@@ -147,29 +147,22 @@ class HttpConfig < ConfigFile
   end
 
   def directory_indexes()
-    if(!@config.has_key?('Listen'))
+    if(!@config.has_key?('DirectoryIndex'))
       return ""
     end
     return @config['DirectoryIndex']
   end
 end
 
-
 # Here's some code to illustrate how this works!
-class Test
-  def start
-    mimes=MimeTypes.new(File.open("config/mime.types", "r").read()).load
-    mimes.mime_types.each do |k,v|
-      print k, " : ",v, "\n"
-    end
-    puts mimes.for('h261')
-    
-    httpd_conf=HttpConfig.new(File.open("config/httpd.conf", "r").read())
-    print "Server Root: ", httpd_conf.server_root(),"\n"
-    print "Document Root: ", httpd_conf.document_root(),"\n"
-    print "Listen: ", httpd_conf.listen(),"\n"
-    print "Log File: ",httpd_conf.log_file(),"\n"
-  end
-end
+# mimes=MimeTypes.new(File.open("config/mime.types", "r").read()).load
+# mimes.mime_types.each do |k,v|
+#   print k, " : ",v, "\n"
+# end
+# puts mimes.for('h261')
 
-#Test.new.start
+# httpd_conf=HttpConfig.new(File.open("config/httpd.conf", "r").read())
+# print "Server Root: ", httpd_conf.server_root(),"\n"
+# print "Document Root: ", httpd_conf.document_root(),"\n"
+# print "Listen: ", httpd_conf.listen(),"\n"
+# print "Log File: ",httpd_conf.log_file(),"\n"
