@@ -1,9 +1,7 @@
 require 'socket' # allows use of TCPServer & TCPSocket classes
 require 'thread'
 require File.join File.dirname(__FILE__), 'config'
-require File.join File.dirname(__FILE__), 'request'
-require File.join File.dirname(__FILE__), 'response'
-require File.join File.dirname(__FILE__), 'htaccess'
+require File.join File.dirname(__FILE__), 'worker'
 
 #DEFAULT_PORT = 8999
 
@@ -18,15 +16,14 @@ class Webserver
     read_config_file()
     @port = @httpd_config.listen()
     
-    
     loop do
       puts "-----------------------------------------------"
       puts "Opening server socket to listen for connections"
       @socket = server.accept # open socket, wait until client connects
       
       puts "Received connection\n\n"
-      Request.new(@socket).parse # parse client's HTTP request
-      @socket.puts Response.new.to_s # print HTTP response to client
+      
+      Worker.new(@socket, @httpd_config).start
       
       @socket.close # terminate connection
       

@@ -34,3 +34,9 @@ class Response
     return s
   end
 end
+
+class Response_Factory
+  def create(request, resource)
+    
+  end
+end

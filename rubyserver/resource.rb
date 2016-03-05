@@ -51,10 +51,8 @@ request[:extension] = 'jpg'
 # request[:extension] = ''
 
 
-httpd_conf = HttpConfig.new(File.open("config/httpd.conf", "r").read())
-mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
-
-resource = Resource.new(request, httpd_conf, mime_types)
-resource.resolve
-
-
+#httpd_conf = HttpConfig.new(File.open("config/httpd.conf", "r").read())
+#mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
+#
+#resource = Resource.new(request, httpd_conf, mime_types)
+#resource.resolve
