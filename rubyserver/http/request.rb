@@ -1,6 +1,6 @@
 # receives a stream in constructor, & parses content into members
 class Request
-  attr_reader :verb, :uri, :query, :version, :headers, :body, :http_request
+  attr_reader :verb,:uri,:query,:version,:headers,:body,:http_request,:extension
   
   def initialize(stream)
     @http_request = stream
@@ -10,6 +10,7 @@ class Request
     request_line = @http_request.gets.split(" ")
     puts request_line.join(" ")
     
+    path, @extension = request_line[1].split(".")
     path, query = request_line[1].split("?")
     
     @verb    = request_line[0]

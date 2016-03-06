@@ -2,10 +2,10 @@
 class Response
   attr_reader :http_version, :response_code, :response_phrase, :headers, :body
   
-  def initialize(request, error)
+  def initialize(request, response_code)
     @body            = "body"
-    @http_version    = request[:uri]
-    @response_code   = error
+    @http_version    = "HTTP/1.1"
+    @response_code   = response_code
     @response_phrase = RESPONSE_PHRASES[@response_code]
     @headers         ={"Date" => Time.now,
                        "Server" => "derp",

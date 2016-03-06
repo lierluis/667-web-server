@@ -5,44 +5,47 @@ require_relative 'config'
 
 # methods: initialize(uri, httpd_conf, mime_types), resolve, mime_type, script?
 class Resource
-attr_reader :request, :httpconf, :mimes
-#URI is supposed to be the parse request
-#http_conf
+  attr_reader :request, :httpconf, :mimes
+  #URI is supposed to be the parse request
+  #http_conf
 
-def initialize(uri, httpd_conf, mime_types)
-  @request = uri
-  @httpconf = httpd_conf
-  @mimes = mime_types
-end
-
-def resolve
-  print @request[:uri], "\n"
-  #Checking if the URI is alias
-  if @request[:uri] == @httpconf.alias_sym() #compares uri with the alias symbolic
-    @absolute_path = @httpconf.alias_abs()  
-  #checking if the URI is Script alias
-  elsif @request[:uri] == @httpconf.script_alias_sym()  #compares uri with the script alias symbolic
-    @absolute_path = @httpconf.script_alias_abs() 
-  else #if not any alias 
-    @absolute_path = @httpconf.document_root() + @request[:uri] 
+  def initialize(uri, httpd_conf, mime_types)
+    @request = uri
+    @httpconf = httpd_conf
+    @mimes = mime_types
   end
-  #is this a file a valid file from mime or if its not we append the DirIndex othewise return absolute path 
-  if request[:extension] != '' and @mimes.for(@request[:extension]) != nil
-    puts @mimes.for(@request[:extension])
+
+  def resolve
+    print @request.uri, "\n"
+    
+    #check if the URI is alias (compare URI with the alias symbolic)
+    if @request.uri == @httpconf.alias_sym()
+      @absolute_path = @httpconf.alias_abs()
+    #check if URI is Script alias (compare URI with the script alias symbolic)
+    elsif @request.uri == @httpconf.script_alias_sym() 
+      @absolute_path = @httpconf.script_alias_abs() 
+    else #if not any alias
+      @absolute_path = @httpconf.document_root() + @request.uri
+    end
+    
+    #is this a valid file from mime types?
+    #if not we append the DirIndex; otherwise return absolute path 
+    if request.extension != '' and @mimes.for(@request.extension) != nil
+      puts @mimes.for(@request.extension)
+      print @absolute_path, "\n"
+      return @absolute_path
+    end
+    @index = @httpconf.directory_indexes().join
+    @absolute_path += @index #adds the directory index 
     print @absolute_path, "\n"
+
+    # myfile = IO.readlines(@absolute_path)#read htmlfile
+    #   #@session.puts(Time.now.ctime) # Send the time to the client
+    # @session.puts myfile#post html
     return @absolute_path
+
+
   end
-  @index = @httpconf.directory_indexes().join
-  @absolute_path += @index #adds the directory index 
-  print @absolute_path, "\n"
-
-  # myfile = IO.readlines(@absolute_path)#read htmlfile
-  #   #@session.puts(Time.now.ctime) # Send the time to the client
-  # @session.puts myfile#post html
-  return @absolute_path
-
-
-end
 end
 
 
