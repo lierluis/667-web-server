@@ -8,10 +8,10 @@ class Webserver
   
   def initialize(options={})
     @options = options
+    read_config_file() # Devin: moving this call to initialize instead of start()
   end
   
   def start
-    read_config_file()
     @port = @httpd_config.listen()
     print "Now listening at port: ", @port, "\n"
     #puts "Opening server socket to listen for connections"
