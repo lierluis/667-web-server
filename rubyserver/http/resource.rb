@@ -19,15 +19,14 @@ class Resource
     print @request.uri, "\n"
     
     #check if the URI is alias (compare URI with the alias symbolic)
-    if @request.uri == @httpconf.alias_sym()
-      @absolute_path = @httpconf.alias_abs()
+    if @httpconf.alias(@request.uri)
+      @absolute_path = @httpconf.alias(@request.uri)
     #check if URI is Script alias (compare URI with the script alias symbolic)
-    elsif @request.uri == @httpconf.script_alias_sym() 
-      @absolute_path = @httpconf.script_alias_abs() 
+    elsif @httpconf.script_alias(@request.uri) 
+      @absolute_path = @httpconf.script_alias(@request.uri)
     else #if not any alias
       @absolute_path = @httpconf.document_root() + @request.uri
     end
-    
     #is this a valid file from mime types?
     #if not we append the DirIndex; otherwise return absolute path 
     if request.extension != '' and @mimes.for(@request.extension) != nil
