@@ -8,7 +8,7 @@ class Webserver
   
   def initialize(options={})
     @options = options
-    read_config_file() # Devin: moving this call to initialize instead of start()
+    read_config_file()
   end
   
   def start
