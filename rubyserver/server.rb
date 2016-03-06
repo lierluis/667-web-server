@@ -1,9 +1,7 @@
 require 'socket' # allows use of TCPServer & TCPSocket classes
 require 'thread'
-require File.join File.dirname(__FILE__), 'config'
-require File.join File.dirname(__FILE__), 'worker'
-
-#DEFAULT_PORT = 8999
+require File.join File.dirname(__FILE__), 'http/config'
+require File.join File.dirname(__FILE__), 'http/worker'
 
 class Webserver
   attr_reader :options, :socket, :port, :mime_types, :httpd_config
@@ -15,25 +13,23 @@ class Webserver
   def start
     read_config_file()
     @port = @httpd_config.listen()
+    print "Now listening at port: ", @port, "\n"
+    #puts "Opening server socket to listen for connections"
     
     loop do
       puts "-----------------------------------------------"
       puts "Opening server socket to listen for connections"
       @socket = server.accept # open socket, wait until client connects
-      
       puts "Received connection\n\n"
-      
-      Worker.new(@socket, @httpd_config).start
-      
+      Worker.new(@socket, @httpd_config, @mime_types).start
       @socket.close # terminate connection
       
-#      Thread.new(@socket) do |newsocket| # thread for every session
-#        puts "Received connection\n"
-#        Request.new(newsocket).parse
-#        newsocket.puts Response.new.to_s
-#        
-#        newsocket.close # terminate connection
-#      end
+#     Thread.new(@socket) do |newsocket| # thread for every session
+#       puts "-----------------------------------------------"
+#       puts "Received connection\n"
+#       Worker.new(newsocket).parse
+#       newsocket.close # terminate connection
+#     end
     end
   end
   
