@@ -74,22 +74,22 @@ class HttpConfig < ConfigFile
   def process_lines()
     @config=Hash.new("")
     line_hash=load() #retrieves hash of the multi-line string
-    @config['ScriptAlias']=Hash.new() #Multiple Script Aliases/Aliases may exist, requiring a nested hash
+    @config['ScriptAlias']=Hash.new() # Multiple ScriptAliases/Aliases may exist
     @config['Alias']=Hash.new()
-    @config['DirectoryIndex']=Array.new() # Multiple DirectoryIndexes may exist, requiring a nested array
+    @config['DirectoryIndex']=Array.new() # Multiple DirectoryIndexes may exist
     line_hash.each do |config_option, config_values|
-      if(config_option=='ScriptAlias') #store all Script Alias values in one nested hash
+      if(config_option=='ScriptAlias') #Store all values in nested Hash
         config_values=config_values.split(' ')
-        @config['ScriptAlias'][config_values[0]]=config_values[1]
-      elsif(config_option=='Alias') #store all Alias values in one nested hash
+        @config['ScriptAlias'][config_values[0]]=config_values[1].strip()
+      elsif(config_option=='Alias') #Store all Alias values in one nested hash
         config_values=config_values.split(' ')
-        @config['Alias'][config_values[0]]=config_values[1]
+        @config['Alias'][config_values[0]]=config_values[1].strip()
       elsif(config_option=='DirectoryIndex')
         config_values.split(' ').each_with_index do |value, iteration|
-          @config['DirectoryIndex'][iteration]=value
+          @config['DirectoryIndex'][iteration]=value.strip()
         end
       else
-        @config[config_option]=config_values
+        @config[config_option]=config_values.strip()
       end
     end
   end
@@ -107,7 +107,6 @@ class HttpConfig < ConfigFile
   end
 
   def log_file()
- 
     return @config['LogFile']
   end
 
