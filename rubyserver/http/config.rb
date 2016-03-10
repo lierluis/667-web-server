@@ -72,84 +72,65 @@ class HttpConfig < ConfigFile
   end
 
   def process_lines()
-    @config=Hash.new()
+    @config=Hash.new("")
     line_hash=load() #retrieves hash of the multi-line string
+    @config['ScriptAlias']=Hash.new() # Multiple ScriptAliases/Aliases may exist
+    @config['Alias']=Hash.new()
+    @config['DirectoryIndex']=Array.new() # Multiple DirectoryIndexes may exist
     line_hash.each do |config_option, config_values|
-      @config[config_option]=Array.new()
-      config_values.split(' ').each_with_index do |config_value, iteration|
-        @config[config_option][iteration]=config_value
+      if(config_option=='ScriptAlias') #Store all values in nested Hash
+        config_values=config_values.split(' ')
+        @config['ScriptAlias'][config_values[0]]=config_values[1].strip()
+      elsif(config_option=='Alias') #Store all Alias values in one nested hash
+        config_values=config_values.split(' ')
+        @config['Alias'][config_values[0]]=config_values[1].strip()
+      elsif(config_option=='DirectoryIndex')
+        config_values.split(' ').each_with_index do |value, iteration|
+          @config['DirectoryIndex'][iteration]=value.strip()
+        end
+      else
+        @config[config_option]=config_values.strip()
       end
     end
   end
 
-  #TODO: implement exception throwing when attributes aren't found in accessors
   def server_root()
-    if(!@config.has_key?('ServerRoot'))
-      return ""
-    end
-    return @config['ServerRoot'][0]
+    return @config['ServerRoot']
   end
 
   def document_root()
-    if(!@config.has_key?('DocumentRoot'))
-      return ""
-    end
-    return @config['DocumentRoot'][0]
+    return @config['DocumentRoot']
   end
 
   def listen()
-    if(!@config.has_key?('Listen'))
-      return ""
-    end
-    return @config['Listen'][0]
+    return @config['Listen']
   end
 
   def log_file()
-    if(!@config.has_key?('LogFile'))
-      return ""
-    end
-    return @config['LogFile'][0]
+    return @config['LogFile']
   end
 
   def alias_sym()
-    if(!@config.has_key?('Alias'))
-      return ""
-    end
-    return @config['Alias'][0]
+    return @config['Alias']
   end
 
   def alias_abs()
-    if(!@config.has_key?('Alias'))
-      return ""
-    end
-    return @config['Alias'][1]
+    return @config['Alias']
   end
 
-  def script_alias_sym()
-    if(!@config.has_key?('ScriptAlias'))
-      return ""
-    end
-    return @config['ScriptAlias'][0]
+  def alias(path)
+    return @config['Alias'][path]
   end
 
-  def script_alias_abs()
-    if(!@config.has_key?('ScriptAlias'))
-      return ""
-    end
-    return @config['ScriptAlias'][1]
+  def script_alias(path)
+    return @config['ScriptAlias'][path]
   end
 
   def access_file_name()
-    if(!@config.has_key?('AccessFileName'))
-      return ""
-    end
-    return @config['AccessFileName'][0]
+    return @config['AccessFileName']
   end
 
   def directory_indexes()
-    if(!@config.has_key?('DirectoryIndex'))
-      return ""
-    end
     return @config['DirectoryIndex']
   end
 end
@@ -161,9 +142,8 @@ end
 # end
 # puts mimes.for('h261')
 
-# httpd_conf=HttpConfig.new(File.open("config/httpd.conf", "r").read())
+# httpd_conf=HttpConfig.new(File.open("../config/httpd.conf", "r").read())
 # print "Server Root: ", httpd_conf.server_root(),"\n"
 # print "Document Root: ", httpd_conf.document_root(),"\n"
 # print "Listen: ", httpd_conf.listen(),"\n"
 # print "Log File: ",httpd_conf.log_file(),"\n"
-

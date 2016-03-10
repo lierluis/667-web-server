@@ -34,6 +34,6 @@ class Request
       @body = @http_request.read(content_length)
       puts @body
     end
-    
+  
   end
 end

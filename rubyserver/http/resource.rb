@@ -16,27 +16,33 @@ class Resource
   end
 
   def resolve
-    print @request.uri, "\n"
-    
     #check if the URI is alias (compare URI with the alias symbolic)
-    if @request.uri == @httpconf.alias_sym()
-      @absolute_path = @httpconf.alias_abs()
+    if @httpconf.alias(@request.uri)
+      @absolute_path = @httpconf.alias(@request.uri)
     #check if URI is Script alias (compare URI with the script alias symbolic)
-    elsif @request.uri == @httpconf.script_alias_sym() 
-      @absolute_path = @httpconf.script_alias_abs() 
+    elsif @httpconf.script_alias(@request.uri) 
+      @absolute_path = @httpconf.script_alias(@request.uri)
     else #if not any alias
       @absolute_path = @httpconf.document_root() + @request.uri
     end
-    
     #is this a valid file from mime types?
     #if not we append the DirIndex; otherwise return absolute path 
-    if request.extension != '' and @mimes.for(@request.extension) != nil
+    if @request.extension != '' and @mimes.for(@request.extension) != nil
       puts @mimes.for(@request.extension)
       print @absolute_path, "\n"
       return @absolute_path
     end
-    @index = @httpconf.directory_indexes().join
-    @absolute_path += @index #adds the directory index 
+
+    # if we have not returned yet, the URI is almost certainly a directory.
+    index_to_append="index.html" # default value
+    directory_indexes = @httpconf.directory_indexes()
+    directory_indexes.each do |directory_index|
+      if(File.exist?(@absolute_path+directory_index))
+        index_to_append=directory_index #adds the directory index
+        break
+      end
+    end
+    @absolute_path+=index_to_append
     print @absolute_path, "\n"
 
     # myfile = IO.readlines(@absolute_path)#read htmlfile
@@ -70,5 +76,4 @@ end
 
 # resource = Resource.new(request, httpd_conf, mime_types)
 # resource.resolve
-
 

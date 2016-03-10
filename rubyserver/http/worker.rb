@@ -24,7 +24,7 @@ class Worker
     resource = Resource.new(request, @config, @mime_types)
     file = resource.resolve
     
-    puts file
+    #puts file
 
     begin
       myfile = IO.readlines(file)
@@ -40,8 +40,9 @@ class Worker
       puts response_code
     end
 
-    response = Response.new(request, response_code)
-    @client.puts response.to_s
+    response = Response.new(request, response_code) 
+    @client.puts response.to_s 
+    @logger.write(request,response.logResponse)
 
   end
 
