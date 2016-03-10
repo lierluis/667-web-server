@@ -31,7 +31,7 @@ class Request
     # print body if 'Content-Length' header exists
     if @headers.has_key?('Content-Length')
       content_length = @headers.values_at('Content-Length')[0].to_i
-      @body = @http_request.read(content_length)
+      @body = @socket.read(content_length)
       puts @body
     end
   
