@@ -1,13 +1,13 @@
 # receives a stream in constructor, & parses content into members
 class Request
-  attr_reader :verb,:uri,:query,:version,:headers,:body,:http_request,:extension
+  attr_reader :verb,:uri,:query,:version,:headers,:body,:socket,:extension
   
   def initialize(stream)
-    @http_request = stream
+    @socket = stream
   end
   
   def parse
-    request_line = @http_request.gets.split(" ")
+    request_line = @socket.gets.split(" ")
     puts request_line.join(" ")
     
     path, @extension = request_line[1].split(".")
@@ -20,7 +20,7 @@ class Request
     @headers = Hash.new
     
     # get headers up until blank line
-    while (header = @http_request.gets) != "\r\n"
+    while (header = @socket.gets) != "\r\n"
       key, value = header.split(": ")
       @headers.store(key, value)
     end

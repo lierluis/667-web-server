@@ -33,11 +33,4 @@ class Response
     
     return s
   end
-
-  def logResponse
-    responseTolog = {}
-    responseTolog[:code] = @response_code
-    responseTolog[:phrase] = @response_phrase
-    return responseTolog
-  end
 end
