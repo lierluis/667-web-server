@@ -33,38 +33,40 @@ class Worker
     # pass the request to find the resource
     resource = Resource.new(request, @config, @mime_types)
     file = resource.resolve
-    user_identif = request.headers['Authorization']
-    pass = user_identif.split(" ")
-    @client.puts pass
-    decoded_ident = Base64.decode64(pass[1])
 
     #check if the resource is protected
-    accessChecker = HtaccessChecker.new(file,decoded_ident)
-    isprotected = accessChecker.protected?
-    if isprotected
-        # authentification = IO.readlines("public_html/authentification.html")
-        # @client.puts authentification
-        
-    canauthorized = accessChecker.can_authorized?
-      if canauthorized 
-        begin
-          myfile = IO.readlines(file)
-          if file
-            response_code = 200
+    accessChecker = HtaccessChecker.new(file,request.headers)
+    
+    if accessChecker.protected?
+  
+      if accessChecker.can_authorized?
+
+        if accessChecker.authorized?
+
+          begin
+            myfile = IO.readlines(file)
+            if file
+              response_code = 200
+              @client.puts myfile
+              puts response_code
+            end
+          rescue
+            myfile = IO.readlines("public_html/404.html")
+            response_code = 404
             @client.puts myfile
             puts response_code
           end
-        rescue
-          myfile = IO.readlines("public_html/404.html")
-          response_code = 404
+        else
+          myfile = IO.readlines("public_html/403.html")
+          response_code = 403
           @client.puts myfile
           puts response_code
         end
       else
         myfile = IO.readlines("public_html/401.html")
-          response_code = 401
-          @client.puts myfile
-          puts response_code
+        response_code = 401
+        @client.puts myfile
+        puts response_code
       end
     else 
       #Is the file is a executable it gotta be in cgi-bin

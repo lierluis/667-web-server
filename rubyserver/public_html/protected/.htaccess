@@ -1,3 +1,4 @@
+Htaccess "/home/izaacg/3_5webserver/SFSU_CSC_667/rubyserver/public_html/protected/.htaccess"
 AuthUserFile "/home/izaacg/3_5webserver/SFSU_CSC_667/rubyserver/public_html/protected/.htpasswd"  
 AuthName "Restricted Directory" 
 AuthType Basic 
