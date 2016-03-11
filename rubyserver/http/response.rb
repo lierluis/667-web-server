@@ -4,7 +4,7 @@ class Response
   
   def initialize(request, response_code)
     @body            = "body"
-    @http_version    = "HTTP/1.1"
+    @http_version    = request.version
     @response_code   = response_code
     @response_phrase = RESPONSE_PHRASES[@response_code]
     @headers         ={"Date" => Time.now,
@@ -26,18 +26,11 @@ class Response
   }
   
   def to_s
-    s = "\r\n#{@http_version} #{@response_code} #{@response_phrase}\r\n"
+    s = "#{@http_version} #{@response_code} #{@response_phrase}\r\n"
     @headers.map{|key, value| s += "#{key}: #{value}\r\n"}
     s += "\r\n" # blank line
-    s += "#{@body}\r\n"
+    s += "#{@body}"
     
     return s
-  end
-
-  def logResponse
-    responseTolog = {}
-    responseTolog[:code] = @response_code
-    responseTolog[:phrase] = @response_phrase
-    return responseTolog
   end
 end

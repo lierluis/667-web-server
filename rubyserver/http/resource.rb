@@ -5,37 +5,35 @@ require_relative 'config'
 
 # methods: initialize(uri, httpd_conf, mime_types), resolve, mime_type, script?
 class Resource
-  attr_reader :request, :httpconf, :mimes
-  #URI is supposed to be the parse request
-  #http_conf
+  attr_reader :request, :httpd_conf, :mime_types
 
-  def initialize(uri, httpd_conf, mime_types)
-    @request = uri
-    @httpconf = httpd_conf
-    @mimes = mime_types
+  def initialize(request, httpd_conf, mime_types)
+    @request = request
+    @httpd_conf = httpd_conf
+    @mime_types = mime_types
   end
 
   def resolve
     #check if the URI is alias (compare URI with the alias symbolic)
-    if @httpconf.alias(@request.uri)
-      @absolute_path = @httpconf.alias(@request.uri)
+    if @httpd_conf.alias(@request.uri)
+      @absolute_path = @httpd_conf.alias(@request.uri)
     #check if URI is Script alias (compare URI with the script alias symbolic)
-    elsif @httpconf.script_alias(@request.uri) 
-      @absolute_path = @httpconf.script_alias(@request.uri)
+    elsif @httpd_conf.script_alias(@request.uri) 
+      @absolute_path = @httpd_conf.script_alias(@request.uri)
     else #if not any alias
-      @absolute_path = @httpconf.document_root() + @request.uri
+      @absolute_path = @httpd_conf.document_root() + @request.uri
     end
     #is this a valid file from mime types?
     #if not we append the DirIndex; otherwise return absolute path 
-    if @request.extension != '' and @mimes.for(@request.extension) != nil
-      puts @mimes.for(@request.extension)
+    if @request.extension != '' and @mime_types.for(@request.extension) != nil
+      puts @mime_types.for(@request.extension)
       print @absolute_path, "\n"
       return @absolute_path
     end
 
     # if we have not returned yet, the URI is almost certainly a directory.
     index_to_append="index.html" # default value
-    directory_indexes = @httpconf.directory_indexes()
+    directory_indexes = @httpd_conf.directory_indexes()
     directory_indexes.each do |directory_index|
       if(File.exist?(@absolute_path+directory_index))
         index_to_append=directory_index #adds the directory index

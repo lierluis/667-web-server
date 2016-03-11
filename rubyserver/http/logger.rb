@@ -3,16 +3,22 @@ class Logger
   attr_reader :file, :filepath
   
   def initialize(filepath)
-    @filepath = filepath # log.txt
+    @filepath = filepath
+    @file = File.open(@filepath, 'a')
   end
   
   def write(request, response)
-  	#sample still need to add 127.0.0.1 user-identifier frank 
-  	#127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
-  	File.open(@filepath, 'a') do |f|
-  	f << Time.now << " "
-  	f << "\"" << request.verb << " " <<request.uri << " " <<request.version << "\" "
-  	f << response[:code] << " " << response[:phrase] << "\n"
-	end
+  	remote_host = request.socket.addr.last
+    remote_logname = "-" #TODO: check if IdentityCheck is enabled
+    remote_user = "-" #TODO: get username if resource is password-protected
+    time = Time.now
+    request_line = "#{request.verb} #{request.uri} #{request.version}"
+    status = response.response_code
+    response_size = (response.body.bytesize > 0) ? response.body.bytesize : "-"
+    
+    log = "#{remote_host} #{remote_logname} #{remote_user} " +
+          "[#{time}] \"#{request_line}\" #{status} #{response_size}\n"
+    
+    @file << log
   end
 end

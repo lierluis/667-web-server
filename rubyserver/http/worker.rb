@@ -96,7 +96,7 @@ class Worker
     end
     response = Response.new(request, response_code) 
     @client.puts response.to_s 
-    @logger.write(request,response.logResponse)
+    @logger.write(request,response)
 
   end
 
