@@ -37,14 +37,6 @@ class Worker
     pass = user_identif.split(" ")
     @client.puts pass
     decoded_ident = Base64.decode64(pass[1])
-    @client.puts decoded_ident
-    htaccess = Htaccess.new(File.open("/home/izaacg/3_5webserver/SFSU_CSC_667/rubyserver/public_html/protected/.htaccess", "r").read())
-    htpwd_file = File.open(htaccess.auth_user_file, "r")
-    htpwd_content = htpwd_file.read()
-    htpwd_array = htpwd_content.split("\n")
-    @client.puts htpwd_array[0]
-    deco = Base64.decode64(htpwd_array[0])
-    @client.puts deco
 
     #check if the resource is protected
     accessChecker = HtaccessChecker.new(file,decoded_ident)
