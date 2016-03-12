@@ -28,8 +28,8 @@ class Worker
       response_code = 400
       @client.puts myfile
       puts response_code
-    end  
-    
+    end
+
     # pass the request to find the resource
     resource = Resource.new(request, @config, @mime_types)
     file = resource.resolve
@@ -43,18 +43,45 @@ class Worker
 
         if accessChecker.authorized?
 
-          begin
-            myfile = IO.readlines(file)
-            if file
-              response_code = 200
+          if request.verb == 'GET'
+            begin
+              myfile = IO.readlines(file)
+              if file
+                response_code = 200
+                @client.puts myfile
+                puts response_code
+              end
+            rescue
+              myfile = IO.readlines("public_html/404.html")
+              response_code = 404
               @client.puts myfile
               puts response_code
             end
-          rescue
-            myfile = IO.readlines("public_html/404.html")
-            response_code = 404
-            @client.puts myfile
-            puts response_code
+          end
+          if request.verb == 'HEAD'
+            begin
+              myfile = IO.readlines(file)
+              if file
+                response_code = 200
+                @client.puts response_code
+                puts response_code
+              end
+            rescue
+              myfile = IO.readlines("public_html/404.html")
+              response_code = 404
+              @client.puts myfile
+              puts response_code
+            end
+          end
+          if request.verb == 'PUT'
+            File.open(file, 'w') {|f| f.write("just created this file") }
+            @client.puts "New file created: "
+            @client.puts file
+          end
+          if request.verb == 'DELETE'
+            File.delete(file)
+            @client.puts "The following file was deleted: "
+            @client.puts file
           end
         else
           myfile = IO.readlines("public_html/403.html")
@@ -74,11 +101,38 @@ class Worker
         if file.include? "cgi-bin"
           IO.popen([{'ENV_VAR' => 'value'},file]) {|io| @client.puts io.read}
         else
-          myfile = IO.readlines(file)
-          if file
-            response_code = 200
-            @client.puts myfile
-            puts response_code
+          if request.verb == 'PUT'
+            File.open(file, 'w') {|f| f.write("just created this file") }
+            @client.puts "New file created: "
+            @client.puts file
+          end
+          if request.verb == 'DELETE'
+            File.delete(file)
+            @client.puts "The following file was deleted: "
+            @client.puts file
+          end
+          if request.verb == 'GET'
+            myfile = IO.readlines(file)
+            if file
+              response_code = 200
+              @client.puts myfile
+              puts response_code
+            end
+          end
+          if request.verb == 'HEAD'
+            begin
+              myfile = IO.readlines(file)
+              if file
+                response_code = 200
+                @client.puts response_code
+                puts response_code
+              end
+            rescue
+              myfile = IO.readlines("public_html/404.html")
+              response_code = 404
+              @client.puts myfile
+              puts response_code
+            end
           end
         end
       rescue
