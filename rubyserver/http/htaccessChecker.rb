@@ -19,7 +19,7 @@ class HtaccessChecker
     end
   end
 
-  def can_authorized?
+  def can_authorize?
     user_identif = headers['Authorization']
     if user_identif == nil
       return false

@@ -24,6 +24,10 @@ class Response
     404 => 'Not Found', # resource not found but may be available in the future
     500 => 'Internal Server Error' # unexpected condition encountered
   }
+
+  def codeToHtml
+    return @response_code+".html"
+  end
   
   def to_s
     s = "#{@http_version} #{@response_code} #{@response_phrase}\r\n"

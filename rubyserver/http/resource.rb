@@ -14,17 +14,18 @@ class Resource
   end
 
   def resolve
-    #check if the URI is alias (compare URI with the alias symbolic)
-    if @httpd_conf.alias(@request.uri)
-      @absolute_path = @httpd_conf.alias(@request.uri)
-    #check if URI is Script alias (compare URI with the script alias symbolic)
-    elsif @httpd_conf.script_alias(@request.uri) 
+
+    if @httpd_conf.script_alias(@request.uri) 
       @absolute_path = @httpd_conf.script_alias(@request.uri)
-    else #if not any alias
+
+    elsif @httpd_conf.alias(@request.uri)
+      @absolute_path = @httpd_conf.alias(@request.uri)
+
+    else 
       @absolute_path = @httpd_conf.document_root() + @request.uri
+
     end
-    #is this a valid file from mime types?
-    #if not we append the DirIndex; otherwise return absolute path 
+
     if @request.extension != '' and @mime_types.for(@request.extension) != nil
       puts @mime_types.for(@request.extension)
       print @absolute_path, "\n"
@@ -32,7 +33,7 @@ class Resource
     end
 
     # if we have not returned yet, the URI is almost certainly a directory.
-    index_to_append="index.html" # default value
+    index_to_append="" # default value
     directory_indexes = @httpd_conf.directory_indexes()
     directory_indexes.each do |directory_index|
       if(File.exist?(@absolute_path+directory_index))
