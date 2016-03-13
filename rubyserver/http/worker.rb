@@ -35,14 +35,14 @@ class Worker
     file = resource.resolve
 
     #check if the resource is protected
-    accessChecker = HtaccessChecker.new(file,request.headers)
+    accessChecker = HtaccessChecker.new(file,request.headers,@config)
     
     if accessChecker.protected?
   
-      if accessChecker.can_authorized?
+      if accessChecker.can_authorize?
 
         if accessChecker.authorized?
-
+          
           if request.verb == 'GET'
             begin
               myfile = IO.readlines(file)

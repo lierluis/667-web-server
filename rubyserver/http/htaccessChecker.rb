@@ -10,13 +10,19 @@ class HtaccessChecker
   def initialize(path, headers, config) 
     @headers = headers
     @config = config
+
+    #make sure path is a directory, so we can check for existence of access file
+    if not File.directory?(path)
+      path=File.dirname(path)
+    end
+
     #For security, check if the path parameter already points to an access file
     if path.to_s.end_with? '/'+@config.access_file_name
       @path=Pathname.new(path.to_s)
     else
-      @path=Pathname.new(path.join(@config.access_file_name))
+      @path=Pathname.new(path.to_s)
+      @path=@path.join(@config.access_file_name)
     end
-    puts @path
   end
   
   def protected?
