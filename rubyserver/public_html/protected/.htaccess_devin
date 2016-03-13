@@ -1,0 +1,5 @@
+Htaccess "/Users/devinclary1/CSC_667_Project/rubyserver/public_html/protected/.htaccess"
+AuthUserFile "/Users/devinclary1/CSC_667_Project/rubyserver/public_html/protected/.htpasswd"  
+AuthName "Restricted Directory" 
+AuthType Basic 
+Require valid-user
