@@ -64,6 +64,8 @@ class HtaccessChecker
     htpwd_array.each do |content|
       htpasswd_parts = content.split(':')
       compare_string = htpasswd_parts[1].gsub(/{SHA}/, '')
+      puts "Username passed in: "+username+" Username to compare: "+htpasswd_parts[0]
+      puts "Password passed in: "+Digest::SHA1.base64digest(password)+" Password to compare: "+compare_string
       if username == htpasswd_parts[0] && Digest::SHA1.base64digest(password) == compare_string
         return true
       end
