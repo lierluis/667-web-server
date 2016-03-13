@@ -65,7 +65,13 @@ class HtaccessChecker
       htpasswd_parts = content.split(':')
       compare_string = htpasswd_parts[1].gsub(/{SHA}/, '')
       puts "Username passed in: "+username+" Username to compare: "+htpasswd_parts[0]
+      if (not username==htpasswd_parts[0]) and htpasswd_parts[0]=="luis"
+        puts "THE WORLD IS FUCKING ENDING"
+      end
       puts "Password passed in: "+Digest::SHA1.base64digest(password)+" Password to compare: "+compare_string
+      if (not compare_string==Digest::SHA1.base64digest(password)) and Digest::SHA1.base64digest(compare_string)=="5Q3PoTd1eHdZWQzZyVF9eQNwi1o="
+        puts "THE WORLD IS FUCKING ENDING"
+      end
       if username == htpasswd_parts[0] && Digest::SHA1.base64digest(password) == compare_string
         return true
       end
