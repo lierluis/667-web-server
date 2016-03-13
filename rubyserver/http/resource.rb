@@ -3,26 +3,26 @@ require_relative 'config'
 
 # This object will help us figure out where and what the requested resource is.
 
-# methods: initialize(uri, httpd_conf, mime_types), resolve, mime_type, script?
+# methods: initialize(uri, config, mime_types), resolve, mime_type, script?
 class Resource
-  attr_reader :request, :httpd_conf, :mime_types
+  attr_reader :request, :config, :mime_types
 
-  def initialize(request, httpd_conf, mime_types)
+  def initialize(request, config, mime_types)
     @request = request
-    @httpd_conf = httpd_conf
+    @config = config
     @mime_types = mime_types
   end
 
   def resolve
 
-    if @httpd_conf.script_alias(@request.uri) 
-      @absolute_path = @httpd_conf.script_alias(@request.uri)
+    if @config.script_alias(@request.uri) 
+      @absolute_path = @config.script_alias(@request.uri)
 
-    elsif @httpd_conf.alias(@request.uri)
-      @absolute_path = @httpd_conf.alias(@request.uri)
+    elsif @config.alias(@request.uri)
+      @absolute_path = @config.alias(@request.uri)
 
     else 
-      @absolute_path = @httpd_conf.document_root() + @request.uri
+      @absolute_path = @config.document_root() + @request.uri
 
     end
 
@@ -34,7 +34,7 @@ class Resource
 
     # if we have not returned yet, the URI is almost certainly a directory.
     index_to_append="" # default value
-    directory_indexes = @httpd_conf.directory_indexes()
+    directory_indexes = @config.directory_indexes()
     directory_indexes.each do |directory_index|
       if(File.exist?(@absolute_path+directory_index))
         index_to_append=directory_index #adds the directory index
@@ -70,9 +70,9 @@ end
 # # request[:extension] = ''
 
 
-# httpd_conf = HttpConfig.new(File.open("config/httpd.conf", "r").read())
+# config = HttpConfig.new(File.open("config/httpd.conf", "r").read())
 # mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
 
-# resource = Resource.new(request, httpd_conf, mime_types)
+# resource = Resource.new(request, config, mime_types)
 # resource.resolve
 

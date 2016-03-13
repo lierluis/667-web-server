@@ -25,7 +25,7 @@ class Response
     500 => 'Internal Server Error' # unexpected condition encountered
   }
 
-  def codeToHtml
+  def self.codeToHtml
     return @response_code+".html"
   end
   
