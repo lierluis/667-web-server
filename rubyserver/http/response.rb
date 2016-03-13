@@ -14,7 +14,7 @@ class Response
                        "Connection" => "close"}
   end
   
-  RESPONSE_PHRASES = {
+  PHRASES = {
     200 => 'OK', # standard response
     201 => 'Created', # new resource being created
     304 => 'Not Modified', # no need to retransmit resource
