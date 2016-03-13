@@ -63,7 +63,7 @@ class HtaccessChecker
     htpwd_array = htpwd_content.split("\n")
     htpwd_array.each do |content|
       htpasswd_parts = content.split(':')
-      compare_string = htpasswd_parts[1].gsub(/{SHA}/, '')
+      compare_string = htpasswd_parts[1].gsub(/{SHA}/, '').chomp
       if username.chomp == htpasswd_parts[0].chomp && Digest::SHA1.base64digest(password).chomp == compare_string
         return true
       end
