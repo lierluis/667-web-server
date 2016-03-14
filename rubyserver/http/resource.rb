@@ -31,6 +31,9 @@ class Resource
     end
 
     # if we have not returned yet, the URI is almost certainly a directory.
+    if (not @absolute_path.end_with? "/")
+      @absolute_path+='/'
+    end
     index_to_append="" # default value
     directory_indexes = @config.directory_indexes()
     directory_indexes.each do |directory_index|
@@ -40,7 +43,6 @@ class Resource
       end
     end
     @absolute_path+=index_to_append
-    print @absolute_path, "\n"
 
     # myfile = IO.readlines(@absolute_path)#read htmlfile
     #   #@session.puts(Time.now.ctime) # Send the time to the client

@@ -21,15 +21,10 @@ class Webserver
       puts "Opening server socket to listen for connections"
       @socket = server.accept # open socket, wait until client connects
       puts "Received connection\n\n"
-      Worker.new(@socket, @httpd_config, @mime_types).start
-      @socket.close # terminate connection
-      
-#     Thread.new(@socket) do |newsocket| # thread for every session
-#       puts "-----------------------------------------------"
-#       puts "Received connection\n"
-#       Worker.new(newsocket).parse
-#       newsocket.close # terminate connection
-#     end
+      Thread.new(@socket) do |threaded_socket| # thread for every session
+        Worker.new(threaded_socket, @httpd_config, @mime_types).start
+        newsocket.close # terminate connection
+      end
     end
   end
   
