@@ -4,9 +4,9 @@ require_relative 'response'
 require_relative 'logger'
 require_relative 'htaccess'
 require_relative 'htaccessChecker'
+require_relative 'response_factory'
 require 'base64'
 require 'digest'
-
 # responsible for handling a single request/response cycle, and logging it
 class Worker
   attr_reader :client, :config, :logger, :mime_types
@@ -22,128 +22,23 @@ class Worker
     
     request = Request.new(@client) # get request
     begin
-    request.parse
+      request.parse
     rescue
-      myfile = IO.readlines("public_html/400.html")
-      response_code = 400
+      resp_file = IO.readlines(@config.document_root+Response.toPath(NOT_FOUND))
       @client.puts myfile
-      puts response_code
+      puts NOT_FOUND
     end
 
     # pass the request to find the resource
     resource = Resource.new(request, @config, @mime_types)
-    file = resource.resolve
+
+    response, body=ResponseFactory.create(request, resource)
 
     #check if the resource is protected
-    accessChecker = HtaccessChecker.new(file,request.headers,@config)
     
-    if accessChecker.protected?
-  
-      if accessChecker.can_authorize?
-
-        if accessChecker.authorized?
-          
-          if request.verb == 'GET'
-            begin
-              myfile = IO.readlines(file)
-              if file
-                response_code = 200
-                @client.puts myfile
-                puts response_code
-              end
-            rescue
-              myfile = IO.readlines("public_html/404.html")
-              response_code = 404
-              @client.puts myfile
-              puts response_code
-            end
-          end
-          if request.verb == 'HEAD'
-            begin
-              myfile = IO.readlines(file)
-              if file
-                response_code = 200
-                @client.puts response_code
-                puts response_code
-              end
-            rescue
-              myfile = IO.readlines("public_html/404.html")
-              response_code = 404
-              @client.puts myfile
-              puts response_code
-            end
-          end
-          if request.verb == 'PUT'
-            File.open(file, 'w') {|f| f.write("just created this file") }
-            @client.puts "New file created: "
-            @client.puts file
-          end
-          if request.verb == 'DELETE'
-            File.delete(file)
-            @client.puts "The following file was deleted: "
-            @client.puts file
-          end
-        else
-          myfile = IO.readlines("public_html/403.html")
-          response_code = 403
-          @client.puts myfile
-          puts response_code
-        end
-      else
-        myfile = IO.readlines("public_html/401.html")
-        response_code = 401
-        @client.puts myfile
-        puts response_code
-      end
-    else 
-      #Is the file is a executable it gotta be in cgi-bin
-      begin
-        if file.include? "cgi-bin"
-          IO.popen([{'ENV_VAR' => 'value'},file]) {|io| @client.puts io.read}
-        else
-          if request.verb == 'PUT'
-            File.open(file, 'w') {|f| f.write("just created this file") }
-            @client.puts "New file created: "
-            @client.puts file
-          end
-          if request.verb == 'DELETE'
-            File.delete(file)
-            @client.puts "The following file was deleted: "
-            @client.puts file
-          end
-          if request.verb == 'GET'
-            myfile = IO.readlines(file)
-            if file
-              response_code = 200
-              @client.puts myfile
-              puts response_code
-            end
-          end
-          if request.verb == 'HEAD'
-            begin
-              myfile = IO.readlines(file)
-              if file
-                response_code = 200
-                @client.puts response_code
-                puts response_code
-              end
-            rescue
-              myfile = IO.readlines("public_html/404.html")
-              response_code = 404
-              @client.puts myfile
-              puts response_code
-            end
-          end
-        end
-      rescue
-        myfile = IO.readlines("public_html/404.html")
-        response_code = 404
-        @client.puts myfile
-        puts response_code
-      end
-    end
-    response = Response.new(request, response_code) 
-    @client.puts response.to_s 
+    @client.puts response.to_s
+    IO.copy_stream(body, @client)
+    puts response.to_s
     @logger.write(request,response)
 
   end

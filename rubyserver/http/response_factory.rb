@@ -7,19 +7,101 @@ UNAUTHORIZED = 401
 BAD_REQUEST = 400
 FORBIDDEN = 403
 NOT_FOUND = 404
-
-
-
+REDIRECT_CODES=[NOT_FOUND, FORBIDDEN, BAD_REQUEST, UNAUTHORIZED]
 class ResponseFactory
   def self.create(request, resource)
-    begin
-    request.parse
-    rescue
-      html_not_found = IO.readlines(resource.config.document_root+
-      @client.puts html_not_found
-      puts NOT_FOUND
+    config=resource.config
+    mime_types=resource.mime_types
+    # client=request.socket
+    file_path = resource.resolve
+    response_code, file=processRequest(file_path, request, config)
+    if REDIRECT_CODES.include? response_code
+      #lets process a request for the redirect page
+      redirect_path=config.document_root+Response.toPath(response_code)
+      second_resp_code, file=processRequest(redirect_path, request, config)
+    end
+    response = Response.new(request, response_code, file, mime_types)
+    return response, response.body
+  end
+
+  def self.processRequest(file, request, config)
+    access_checker = HtaccessChecker.new(file,request.headers,config)
+    if access_checker.authorized?
+      authorizedRequestFlow(file, request)
+    else
+      return self.unauthorized
     end
   end
-  private 
 
+  def self.authorizedRequestFlow(file, request)
+      if file.include? "cgi-bin"
+          IO.popen([{'ENV_VAR' => 'value'},file]) {|io| return ok, io.read}
+      elsif request.verb == 'GET'
+        return get(file)
+      elsif request.verb == 'HEAD'
+        #Return only the response code from the tuple created by 'get'
+        return get(file)[0]
+      elsif request.verb == 'PUT'
+        return put(file)
+      elsif request.verb == 'DELETE'
+        return delete(file)
+      end
+  end
+
+  def self.delete(file)
+    if File.exist?(file)
+      File.delete(file)
+      return noContent
+    else
+      return notFound
+    end
+  end
+  
+  def self.put(file)
+    begin
+      File.open(file, 'w') {|f| f.write("File created via 'PUT'") }
+      return created
+    rescue
+      return badRequest
+    end
+  end
+
+  def self.get(file)
+    begin
+      retrieved_file=File.open(file, "rb")
+      # retrieved_file = IO.readlines(file)
+      if retrieved_file
+        return ok, retrieved_file
+      else
+        return notFound
+      end
+    rescue
+      return badRequest
+    end
+  end
+
+  def self.unauthorized
+    return UNAUTHORIZED
+  end
+
+  def self.noContent
+    return NO_CONTENT
+  end
+
+  def self.badRequest
+    return BAD_REQUEST
+  end
+
+  def self.created
+    return CREATED
+  end
+
+  def self.ok
+    return OK
+  end
+
+  def self.notFound()
+    html_404 = IO.readlines(config.document_root+Response.toHtml(NOT_FOUND))
+    return NOT_FOUND
+  end
 end

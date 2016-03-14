@@ -27,8 +27,6 @@ class Resource
     end
 
     if @request.extension != '' and @mime_types.for(@request.extension) != nil
-      puts @mime_types.for(@request.extension)
-      print @absolute_path, "\n"
       return @absolute_path
     end
 

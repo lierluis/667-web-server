@@ -1,17 +1,29 @@
+require_relative 'config.rb'
+
 # generates generic OK response to send to the client
 class Response
   attr_reader :http_version, :response_code, :response_phrase, :headers, :body
   
-  def initialize(request, response_code)
-    @body            = "body"
+  def initialize(request, response_code, body, mime_types)
+    @body            ||= body
     @http_version    = request.version
     @response_code   = response_code
-    @response_phrase = RESPONSE_PHRASES[@response_code]
+    @response_phrase = PHRASES[@response_code]
+    body_type=mime_types.for(request.extension)
+    # if body_type=="text/html"
+    #   @body=body.join()
+    #   content_length=@body.bytesize
+    # else
+    content_length=File.size(body)
+    # end
     @headers         ={"Date" => Time.now,
                        "Server" => "derp",
-                       "Content-Type" => "text/plain",
-                       "Content-Length" => "#{@body.bytesize}",
+                       "Content-Type" => mime_types.for(request.extension),
+                       "Content-Length" => "#{content_length}",
                        "Connection" => "close"}
+    if response_code == 401
+      @headers["WWW-Authenticate"]="Basic"
+    end
   end
   
   PHRASES = {
@@ -25,16 +37,16 @@ class Response
     500 => 'Internal Server Error' # unexpected condition encountered
   }
 
-  def self.codeToHtml
-    return @response_code+".html"
+  def self.toPath(code)
+    return '/'+code.to_s+".html"
   end
   
   def to_s
     s = "#{@http_version} #{@response_code} #{@response_phrase}\r\n"
     @headers.map{|key, value| s += "#{key}: #{value}\r\n"}
-    s += "\r\n" # blank line
-    s += "#{@body}"
-    
+    s += "\r\n"
+    # The body will need to be appended directly to the socket as a byte stream
+    # In the event that the body is a binary file, we can't imbed it in a string...
     return s
   end
 end

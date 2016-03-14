@@ -14,7 +14,7 @@ class Logger
     time = Time.now
     request_line = "#{request.verb} #{request.uri} #{request.version}"
     status = response.response_code
-    response_size = (response.body.bytesize > 0) ? response.body.bytesize : "-"
+    response_size = (File.size(response.body) > 0) ? File.size(response.body) : "-"
     
     log = "#{remote_host} #{remote_logname} #{remote_user} " +
           "[#{time}] \"#{request_line}\" #{status} #{response_size}\n"
