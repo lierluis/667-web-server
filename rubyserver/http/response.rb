@@ -10,12 +10,10 @@ class Response
     @response_code   = response_code
     @response_phrase = PHRASES[@response_code]
     body_type=mime_types.for(request.extension)
-    # if body_type=="text/html"
-    #   @body=body.join()
-    #   content_length=@body.bytesize
-    # else
-    content_length=File.size(body)
-    # end
+    content_length=0
+    if @body
+      content_length=File.size(body)
+    end
     @headers         ={"Date" => Time.now,
                        "Server" => "derp",
                        "Content-Type" => mime_types.for(request.extension),

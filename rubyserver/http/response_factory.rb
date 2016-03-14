@@ -18,7 +18,7 @@ class ResponseFactory
     if REDIRECT_CODES.include? response_code
       #lets process a request for the redirect page
       redirect_path=config.document_root+Response.toPath(response_code)
-      second_resp_code, file=processRequest(redirect_path, request, config)
+      throwaway_code, file=get(redirect_path)
     end
     response = Response.new(request, response_code, file, mime_types)
     return response, response.body
@@ -26,16 +26,25 @@ class ResponseFactory
 
   def self.processRequest(file, request, config)
     access_checker = HtaccessChecker.new(file,request.headers,config)
-    if access_checker.authorized?
-      authorizedRequestFlow(file, request)
+    if access_checker.protected?
+      if access_checker.can_authorize?
+        if access_checker.authorized?
+          authorizedRequestFlow(file, request)
+        else
+          return self.forbidden
+        end
+      else
+        self.unauthorized
+      end
     else
-      return self.unauthorized
+      authorizedRequestFlow(file, request)
     end
   end
 
   def self.authorizedRequestFlow(file, request)
       if file.include? "cgi-bin"
-          IO.popen([{'ENV_VAR' => 'value'},file]) {|io| return ok, io.read}
+          IO.popen([{'ENV_VAR' => 'value'},file]) {|io| io.read}
+          return ok
       elsif request.verb == 'GET'
         return get(file)
       elsif request.verb == 'HEAD'
@@ -68,6 +77,9 @@ class ResponseFactory
 
   def self.get(file)
     begin
+      if File.directory?(file)
+        return notFound
+      end
       retrieved_file=File.open(file, "rb")
       # retrieved_file = IO.readlines(file)
       if retrieved_file
@@ -76,10 +88,12 @@ class ResponseFactory
         return notFound
       end
     rescue
-      return badRequest
+      return notFound
     end
   end
-
+  def self.forbidden
+    return FORBIDDEN
+  end
   def self.unauthorized
     return UNAUTHORIZED
   end
@@ -100,8 +114,7 @@ class ResponseFactory
     return OK
   end
 
-  def self.notFound()
-    html_404 = IO.readlines(config.document_root+Response.toHtml(NOT_FOUND))
+  def self.notFound
     return NOT_FOUND
   end
 end

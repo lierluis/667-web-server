@@ -25,7 +25,7 @@ class Worker
       request.parse
     rescue
       resp_file = IO.readlines(@config.document_root+Response.toPath(NOT_FOUND))
-      @client.puts myfile
+      @client.puts resp_file
       puts NOT_FOUND
     end
 
@@ -37,7 +37,9 @@ class Worker
     #check if the resource is protected
     
     @client.puts response.to_s
-    IO.copy_stream(body, @client)
+    if body
+      IO.copy_stream(body, @client)
+    end
     puts response.to_s
     @logger.write(request,response)
 
