@@ -48,11 +48,3 @@ class Htaccess < ConfigFile
   end
   
 end
-
-# sample code
-# 
-#htaccess = Htaccess.new(File.open("public/protected/.htaccess", "r").read())
-#print "AuthUserFile: ", htaccess.auth_user_file(),"\n"
-#print "AuthType: ", htaccess.auth_type(),"\n"
-#print "AuthName: ", htaccess.auth_name(),"\n"
-#print "Require: ", htaccess.require(),"\n"

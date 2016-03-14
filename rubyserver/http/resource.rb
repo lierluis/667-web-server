@@ -1,8 +1,6 @@
 require_relative 'config'
-# Resource
 
 # This object will help us figure out where and what the requested resource is.
-
 # methods: initialize(uri, config, mime_types), resolve, mime_type, script?
 class Resource
   attr_reader :request, :config, :mime_types
@@ -31,7 +29,7 @@ class Resource
     end
 
     # if we have not returned yet, the URI is almost certainly a directory.
-    if (not @absolute_path.end_with? "/")
+    if (not @absolute_path.end_with? "/" and File.directory?(@absolute_path+'/'))
       @absolute_path+='/'
     end
     index_to_append="" # default value
@@ -44,35 +42,7 @@ class Resource
     end
     @absolute_path+=index_to_append
 
-    # myfile = IO.readlines(@absolute_path)#read htmlfile
-    #   #@session.puts(Time.now.ctime) # Send the time to the client
-    # @session.puts myfile#post html
     return @absolute_path
-
 
   end
 end
-
-
-  
-
-# # CODE TO SHOW HOW IT WORKS
-# # suppose we get the request uri is parse and everything
-# request = {}
-# #case1 a pic
-# request[:uri] = 'pictures/picture1.jpg' 
-# request[:extension] = 'jpg'
-# #case2 a alias
-# # request[:uri] = '~things'
-# # request[:extension] = ''
-# #case3 a script alias
-# # request[:uri] = 'cgi-bin'
-# # request[:extension] = ''
-
-
-# config = HttpConfig.new(File.open("config/httpd.conf", "r").read())
-# mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
-
-# resource = Resource.new(request, config, mime_types)
-# resource.resolve
-

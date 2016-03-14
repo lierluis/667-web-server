@@ -23,13 +23,13 @@ class Webserver
       puts "Received connection\n\n"
       Thread.new(@socket) do |threaded_socket| # thread for every session
         Worker.new(threaded_socket, @httpd_config, @mime_types).start
-        newsocket.close # terminate connection
+        threaded_socket.close # terminate connection
       end
     end
   end
   
   def read_config_file
-    @httpd_config = HttpConfig.new(File.open("config/httpd.conf", "r").read())
+    @httpd_config = HttpConfig.new(File.open("config/httpd_devin.conf", "r").read())
     @mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
   end
   

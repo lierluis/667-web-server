@@ -7,6 +7,7 @@ require_relative 'htaccessChecker'
 require_relative 'response_factory'
 require 'base64'
 require 'digest'
+Thread.abort_on_exception = true
 # responsible for handling a single request/response cycle, and logging it
 class Worker
   attr_reader :client, :config, :logger, :mime_types
@@ -29,13 +30,10 @@ class Worker
       puts NOT_FOUND
     end
 
-    # pass the request to find the resource
     resource = Resource.new(request, @config, @mime_types)
 
     response, body=ResponseFactory.create(request, resource)
 
-    #check if the resource is protected
-    
     @client.puts response.to_s
     if body
       IO.copy_stream(body, @client)
