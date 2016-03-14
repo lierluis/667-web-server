@@ -349,3 +349,13 @@
 127.0.0.1 - - [2016-03-13 23:25:23 -0700] "PUT /new HTTP/1.1" 201 -
 127.0.0.1 - - [2016-03-13 23:25:34 -0700] "PUT /new HTTP/1.1" 201 -
 127.0.0.1 - - [2016-03-13 23:27:20 -0700] "PUT /new HTTP/1.1" 201 -
+127.0.0.1 - - [2016-03-13 23:31:45 -0700] "GET / HTTP/1.1" 200 842
+127.0.0.1 - - [2016-03-13 23:31:47 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:47 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:47 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:47 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:48 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:48 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:48 -0700] "GET /protected/authentication.html HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:48 -0700] "GET /protected HTTP/1.1" 401 133
+127.0.0.1 - - [2016-03-13 23:31:49 -0700] "GET /protected HTTP/1.1" 200 814
