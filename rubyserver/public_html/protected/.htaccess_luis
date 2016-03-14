@@ -1,0 +1,4 @@
+AuthUserFile "/home/lierluis/Shared/667-workspace/SFSU_CSC_667/rubyserver/public_html/protected/.htpasswd"  
+AuthName "Restricted Directory" 
+AuthType Basic 
+Require valid-user
