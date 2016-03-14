@@ -2,12 +2,10 @@ require_relative 'resource'
 require_relative 'request'
 require_relative 'response'
 require_relative 'logger'
-require_relative 'htaccess'
 require_relative 'htaccessChecker'
 require_relative 'response_factory'
-require 'base64'
-require 'digest'
 Thread.abort_on_exception = true
+
 # responsible for handling a single request/response cycle, and logging it
 class Worker
   attr_reader :client, :config, :logger, :mime_types
@@ -32,7 +30,7 @@ class Worker
 
     resource = Resource.new(request, @config, @mime_types)
 
-    response, body=ResponseFactory.create(request, resource)
+    response, body = ResponseFactory.create(request, resource)
 
     @client.puts response.to_s
     if body

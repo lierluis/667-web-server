@@ -4,7 +4,7 @@ require 'base64'
 require 'digest'
 require 'pathname'
 class HtaccessChecker
-  attr_reader :path, :headers
+  attr_reader :path, :headers, :config
   
   # 'path' parameter can be both a path object or a path string
   def initialize(path, headers, config) 
@@ -34,7 +34,7 @@ class HtaccessChecker
   end
 
   def can_authorize?
-    user_identif = headers['Authorization']
+    user_identif = @headers['Authorization']
     if user_identif == nil
       return false
     else 
@@ -52,22 +52,25 @@ class HtaccessChecker
       return false
     end
 
-    user_identif = headers['Authorization']
-    pass = user_identif.split(" ")
-    decoded_ident = Base64.decode64(pass[1])
-    htaccess = Htaccess.new(File.open(@path, "r").read())
-    auth_user_file = htaccess.auth_user_file
-    htpwd_file = File.open(auth_user_file, "r")
-    htpwd_content = htpwd_file.read()
+    user_identif       = @headers['Authorization']
+    pass               = user_identif.split(" ")
+    decoded_ident      = Base64.decode64(pass[1])
+    htaccess           = Htaccess.new(File.open(@path, "r").read())
+    auth_user_file     = htaccess.auth_user_file
+    htpwd_file         = File.open(auth_user_file, "r")
+    htpwd_content      = htpwd_file.read()
     username, password = decoded_ident.split(':')
-    htpwd_array = htpwd_content.split("\n")
+    htpwd_array        = htpwd_content.split("\n")
+    
     htpwd_array.each do |content|
       htpasswd_parts = content.split(':')
       compare_string = htpasswd_parts[1].gsub(/{SHA}/, '').chomp
-      if username.chomp == htpasswd_parts[0].chomp && Digest::SHA1.base64digest(password).chomp == compare_string
+      if username.chomp == htpasswd_parts[0].chomp &&
+          Digest::SHA1.base64digest(password).chomp == compare_string
         return true
       end
     end
+    
     return false
   end
 end

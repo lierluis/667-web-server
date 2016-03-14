@@ -1,6 +1,3 @@
-require_relative 'config.rb'
-
-# generates generic OK response to send to the client
 class Response
   attr_reader :http_version, :response_code, :response_phrase, :headers, :body
   
@@ -9,18 +6,22 @@ class Response
     @http_version    = request.version
     @response_code   = response_code
     @response_phrase = PHRASES[@response_code]
-    body_type=mime_types.for(request.extension)
-    content_length=0
+    
+    body_type = mime_types.for(request.extension)
+    content_length = 0
     if @body
-      content_length=File.size(body)
+      content_length = File.size(body)
     end
-    @headers         ={"Date" => Time.now,
-                       "Server" => "derp",
-                       "Content-Type" => mime_types.for(request.extension),
-                       "Content-Length" => "#{content_length}",
-                       "Connection" => "close"}
+    
+    @headers = {
+      "Date" => Time.now,
+      "Server" => "derp",
+      "Content-Type" => mime_types.for(request.extension),
+      "Content-Length" => "#{content_length}",
+      "Connection" => "close"          
+    }
     if response_code == 401
-      @headers["WWW-Authenticate"]="Basic"
+      @headers["WWW-Authenticate"] = "Basic"
     end
   end
   
@@ -36,7 +37,7 @@ class Response
   }
 
   def self.toPath(code)
-    return '/'+code.to_s+".html"
+    return '/' + code.to_s + ".html"
   end
   
   def to_s
@@ -44,7 +45,7 @@ class Response
     @headers.map{|key, value| s += "#{key}: #{value}\r\n"}
     s += "\r\n"
     # The body will need to be appended directly to the socket as a byte stream
-    # In the event that the body is a binary file, we can't imbed it in a string...
+    # In the event that the body is a binary file, we can't imbed it in a string
     return s
   end
 end

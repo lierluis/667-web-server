@@ -13,12 +13,10 @@ class Webserver
   def start
     read_config_file()
     @port = @httpd_config.listen()
-    print "Now listening at port: ", @port, "\n"
-    #puts "Opening server socket to listen for connections"
     
     loop do
-      puts "-----------------------------------------------"
-      puts "Opening server socket to listen for connections"
+      puts "------------------------------------------------------------"
+      puts "Opening server socket to listen for connections at port " + @port
       @socket = server.accept # open socket, wait until client connects
       puts "Received connection\n\n"
       Thread.new(@socket) do |threaded_socket| # thread for every session
@@ -33,7 +31,6 @@ class Webserver
     @mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
   end
   
-  # TCPServer represents a TCP/IP server socket
   def server
     @server ||= TCPServer.open(options.fetch('localhost', @port))
   end

@@ -1,5 +1,6 @@
 require_relative 'config'
 require_relative 'response'
+
 OK = 200
 CREATED = 201
 NO_CONTENT = 204
@@ -8,6 +9,7 @@ BAD_REQUEST = 400
 FORBIDDEN = 403
 NOT_FOUND = 404
 REDIRECT_CODES=[NOT_FOUND, FORBIDDEN, BAD_REQUEST, UNAUTHORIZED]
+
 class ResponseFactory
 
   def self.create(request, resource)
@@ -110,45 +112,31 @@ class ResponseFactory
   end
 
   def self.forbidden
-
     return FORBIDDEN
-
   end
 
   def self.unauthorized
-
     return UNAUTHORIZED
-
   end
 
   def self.noContent
-
     return NO_CONTENT
-
   end
 
   def self.badRequest
-
     return BAD_REQUEST
-
   end
 
   def self.created
-
     return CREATED
-
   end
 
   def self.ok
-
     return OK
-
   end
 
   def self.notFound
-
     return NOT_FOUND
-
   end
 
 end
