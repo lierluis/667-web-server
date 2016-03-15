@@ -8,6 +8,7 @@ UNAUTHORIZED = 401
 BAD_REQUEST = 400
 FORBIDDEN = 403
 NOT_FOUND = 404
+SCRIPT_RUN = 666
 INTERNAL_ERROR = 500
 REDIRECT_CODES=[NOT_FOUND, FORBIDDEN, BAD_REQUEST, UNAUTHORIZED]
 
@@ -19,11 +20,14 @@ class ResponseFactory
     mime_types=resource.mime_types
 
     file_path = resource.resolve
-    response_code, file=processRequest(file_path, request, config)
+    response_code, file=processRequest(file_path, request, resource, config)
 
     if REDIRECT_CODES.include? response_code
       file=self.redirectFile(response_code, config)
+    elsif response_code == SCRIPT_RUN
+      return Response.new(nil, ok, file, mime_types, default=true)
     end
+      
 
     response = Response.new(request, response_code, file, mime_types)
 
@@ -31,14 +35,14 @@ class ResponseFactory
 
   end
 
-  def self.processRequest(file, request, config)
+  def self.processRequest(file, request, resource, config)
 
     access_checker = HtaccessChecker.new(file,request.headers,config)
 
     if access_checker.protected?
       if access_checker.can_authorize?
         if access_checker.authorized?
-          authorizedRequestFlow(file, request)
+          authorizedRequestFlow(file, request, resource, config)
         else
           return self.forbidden
         end
@@ -46,26 +50,28 @@ class ResponseFactory
         self.unauthorized
       end
     else
-      authorizedRequestFlow(file, request)
+      authorizedRequestFlow(file, request, resource, config)
     end
 
   end
 
-  def self.authorizedRequestFlow(file, request)
-
-      if file.include? "cgi-bin"
-          IO.popen([{'ENV_VAR' => 'value'},file]) {|io| io.read}
-          return ok
-      elsif request.verb == 'GET'
-        return get(file)
-      elsif request.verb == 'HEAD'
-        #Return only the response code from the tuple created by 'get'
-        return get(file)[0]
-      elsif request.verb == 'PUT'
-        return put(file)
-      elsif request.verb == 'DELETE'
-        return delete(file)
-      end
+  def self.authorizedRequestFlow(file, request, resource, config)
+    if resource.is_script
+      out = IO.popen([{'ENV_VAR' => 'value'},file])
+      output_filename=config.document_root+'/tmp/out.html'
+      File.open(output_filename , 'w') {|file| file.write(out.readlines.join)}
+      script_out=File.open(output_filename, "rb")
+      return SCRIPT_RUN, script_out
+    elsif request.verb == 'GET'
+      return get(file)
+    elsif request.verb == 'HEAD'
+      #Return only the response code from the tuple created by 'get'
+      return get(file)[0]
+    elsif request.verb == 'PUT'
+      return put(file)
+    elsif request.verb == 'DELETE'
+      return delete(file)
+    end
 
   end
 

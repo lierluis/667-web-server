@@ -2,21 +2,23 @@ require_relative 'config'
 
 # This object will help us figure out where and what the requested resource is.
 class Resource
-  attr_reader :request, :config, :mime_types
-
+  attr_reader :request, :config, :mime_types, :is_script
   def initialize(request, config, mime_types)
     @request = request
     @config = config
     @mime_types = mime_types
+    @is_script = false
   end
 
   def resolve
 
-    if @config.script_alias(@request.uri) 
-      @absolute_path = @config.script_alias(@request.uri)
+    puts File.dirname(@request.uri)
+    if @config.script_alias(File.dirname(@request.uri)) 
+      @absolute_path = @config.script_alias(File.dirname(@request.uri))+File.basename(@request.uri)
+      @is_script = true
 
-    elsif @config.alias(@request.uri)
-      @absolute_path = @config.alias(@request.uri)
+    elsif @config.alias(File.dirname(@request.uri))
+      @absolute_path = @config.alias(File.dirname(@request.uri))+File.basename(@request.uri)
 
     else 
       @absolute_path = @config.document_root() + @request.uri
