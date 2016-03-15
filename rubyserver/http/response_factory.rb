@@ -8,6 +8,7 @@ UNAUTHORIZED = 401
 BAD_REQUEST = 400
 FORBIDDEN = 403
 NOT_FOUND = 404
+INTERNAL_ERROR = 500
 REDIRECT_CODES=[NOT_FOUND, FORBIDDEN, BAD_REQUEST, UNAUTHORIZED]
 
 class ResponseFactory
@@ -109,6 +110,10 @@ class ResponseFactory
       return notFound
     end
 
+  end
+
+  def self.internalError
+    return INTERNAL_ERROR
   end
 
   def self.forbidden

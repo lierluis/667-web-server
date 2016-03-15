@@ -13,24 +13,30 @@ class Worker
   def initialize(client, config, mime_types)
     @client = client # socket
     @config = config
+    @doc_root = @config.document_root
     @mime_types = mime_types
     @logger = Logger.new(@config.log_file)
   end
   
   def start
-    
-    request = Request.new(@client) # get request
     begin
-      request.parse
-    rescue
-      resp_file = IO.readlines(@config.document_root+Response.toPath(NOT_FOUND))
+      begin
+        request = Request.new(@client) # get request
+        request.parse
+      rescue # Bad request
+        resp_file = IO.readlines(@doc_root+Response.toPath(BAD_REQUEST))
+        @client.puts resp_file
+        puts BAD_REQUEST
+        return
+      end
+      resource = Resource.new(request, @config, @mime_types)
+      response, body = ResponseFactory.create(request, resource)
+    rescue # No other errors thrown, default to internal server error
+      resp_file = IO.readlines(@doc_root+Response.toPath(INTERNAL_ERROR))
       @client.puts resp_file
-      puts NOT_FOUND
+      puts INTERNAL_ERROR
+      return
     end
-
-    resource = Resource.new(request, @config, @mime_types)
-
-    response, body = ResponseFactory.create(request, resource)
 
     @client.puts response.to_s
     if body
