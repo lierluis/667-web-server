@@ -20,27 +20,20 @@ class Worker
   
   def start
     begin
-      begin
-        request = Request.new(@client) # get request
-        request.parse
-      rescue # Bad request
-        resp_file = IO.readlines(@doc_root+Response.toPath(BAD_REQUEST))
-        @client.puts resp_file
-        puts BAD_REQUEST
-        return
-      end
+      request = Request.new(@client) # get request
+      request.parse
       resource = Resource.new(request, @config, @mime_types)
-      response, body = ResponseFactory.create(request, resource)
-    rescue # No other errors thrown, default to internal server error
-      resp_file = IO.readlines(@doc_root+Response.toPath(INTERNAL_ERROR))
-      @client.puts resp_file
-      puts INTERNAL_ERROR
-      return
+    rescue
+      response=Response.defaultRedirectResponse(BAD_REQUEST, @config, @mime_types)
     end
-
+    begin
+      response = ResponseFactory.create(request, resource)
+    rescue
+      response=ResponseFactory.defaultRedirectResponse(INTERNAL_ERROR, @config, @mime_types)
+    end
     @client.puts response.to_s
-    if body
-      IO.copy_stream(body, @client)
+    if response.body
+      IO.copy_stream(response.body, @client)
     end
     puts response.to_s
     @logger.write(request,response)

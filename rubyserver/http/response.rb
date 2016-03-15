@@ -1,14 +1,19 @@
 class Response
   attr_reader :http_version, :response_code, :response_phrase, :headers, :body
   
-  def initialize(request, response_code, body, mime_types)
-    @body            ||= body
-    @http_version    = request.version
-    @response_code   = response_code
+  def initialize(request, response_code, body, mime_types, default=false)
+    @body ||= body
+    @response_code = response_code
     @response_phrase = PHRASES[@response_code]
-    
-    body_type = mime_types.for(request.extension)
     content_length = 0
+    content_type = ""
+    if default # Create default response 
+      @http_version = 'HTTP/1.1'
+      content_type = 'html'
+    else
+      @http_version = request.version
+      content_type = mime_types.for(request.extension)
+    end
     if @body
       content_length = File.size(body)
     end
@@ -16,7 +21,7 @@ class Response
     @headers = {
       "Date" => Time.now,
       "Server" => "derp",
-      "Content-Type" => mime_types.for(request.extension),
+      "Content-Type" => "#{content_type}",
       "Content-Length" => "#{content_length}",
       "Connection" => "close"          
     }
@@ -24,10 +29,12 @@ class Response
       @headers["WWW-Authenticate"] = "Basic"
     end
   end
-  
+
+
   PHRASES = {
     200 => 'OK', # standard response
     201 => 'Created', # new resource being created
+    204 => 'No Content', #primarily for DELETE verb, no body returned
     304 => 'Not Modified', # no need to retransmit resource
     400 => 'Bad Request', # server can't process request b/c of client error
     401 => 'Unauthorized', # authentication is required and has failed
@@ -44,8 +51,6 @@ class Response
     s = "#{@http_version} #{@response_code} #{@response_phrase}\r\n"
     @headers.map{|key, value| s += "#{key}: #{value}\r\n"}
     s += "\r\n"
-    # The body will need to be appended directly to the socket as a byte stream
-    # In the event that the body is a binary file, we can't imbed it in a string
     return s
   end
 end

@@ -18,19 +18,16 @@ class ResponseFactory
     config=resource.config
     mime_types=resource.mime_types
 
-    # client=request.socket
     file_path = resource.resolve
     response_code, file=processRequest(file_path, request, config)
 
     if REDIRECT_CODES.include? response_code
-      #process a request for the redirect page
-      redirect_path=config.document_root+Response.toPath(response_code)
-      throwaway_code, file=get(redirect_path)
+      file=self.redirectFile(response_code, config)
     end
 
     response = Response.new(request, response_code, file, mime_types)
 
-    return response, response.body
+    return response
 
   end
 
@@ -110,6 +107,15 @@ class ResponseFactory
       return notFound
     end
 
+  end
+
+  def self.defaultRedirectResponse(code, config, mime_types)
+    file = redirectFile(code, config)
+    response = Response.new(nil, code, file, mime_types, default=true)
+  end
+
+  def self.redirectFile(code, config)
+    return File.open(config.document_root+Response.toPath(code), "rb")
   end
 
   def self.internalError
