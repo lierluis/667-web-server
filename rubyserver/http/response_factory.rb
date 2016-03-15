@@ -59,6 +59,9 @@ class ResponseFactory
     if resource.is_script
       out = IO.popen([{'ENV_VAR' => 'value'},file])
       output_filename=config.document_root+'/tmp/out.html'
+      if File.exist?(output_filename)
+        File.delete(output_filename)
+      end
       File.open(output_filename , 'w') {|file| file.write(out.readlines.join)}
       script_out=File.open(output_filename, "rb")
       return SCRIPT_RUN, script_out
