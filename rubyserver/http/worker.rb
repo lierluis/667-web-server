@@ -33,7 +33,7 @@ class Worker
     end
     @client.puts response.to_s
     if response.body
-      #IO.copy_stream(response.body, @client)
+      IO.copy_stream(response.body, @client)
     end
     puts response.to_s
     @logger.write(request,response)
