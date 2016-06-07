@@ -24,7 +24,7 @@ class Worker
       request.parse
       resource = Resource.new(request, @config, @mime_types)
     rescue
-      response=Response.defaultRedirectResponse(BAD_REQUEST, @config, @mime_types)
+      response=ResponseFactory.defaultRedirectResponse(BAD_REQUEST, @config, @mime_types)
     end
     begin
       response = ResponseFactory.create(request, resource)
@@ -33,7 +33,7 @@ class Worker
     end
     @client.puts response.to_s
     if response.body
-      IO.copy_stream(response.body, @client)
+      #IO.copy_stream(response.body, @client)
     end
     puts response.to_s
     @logger.write(request,response)
