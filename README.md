@@ -11,7 +11,7 @@ Documentation: https://docs.google.com/document/d/1ze8yF1-jbCxfrrQZVcLtrHyFYKSKa
 In order to run the web server, you'll have to modify the filepaths within
 the `httpd.conf` and `.htaccess` files to match your directory structure.
 
-Within the rubyserver/ directory, to run the web server:
+Within the rubyserver/ directory, run the server using:
 ```
 ruby server.rb
 ```
@@ -29,4 +29,4 @@ password: estrada
 ```
 
 ##### Known issues:
-* Doesn't work well with Chromium browser on Ubuntu (use Mozilla Firefox instead).
+* Doesn't work well with the Chromium browser on Ubuntu (use Mozilla Firefox instead).
