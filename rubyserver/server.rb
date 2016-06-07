@@ -6,6 +6,8 @@ require File.join File.dirname(__FILE__), 'http/worker'
 class Webserver
   attr_reader :options, :socket, :port, :mime_types, :httpd_config
   
+  DEFAULT_PORT = 5678
+
   def initialize(options={})
     @options = options
   end
@@ -32,7 +34,7 @@ class Webserver
   end
   
   def server
-    @server ||= TCPServer.open(options.fetch('localhost', @port))
+    @server ||= TCPServer.open(options.fetch(DEFAULT_PORT, @port))
   end
 end
 
