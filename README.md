@@ -11,10 +11,9 @@ Documentation: https://docs.google.com/document/d/1ze8yF1-jbCxfrrQZVcLtrHyFYKSKa
 In order to run the web server, you'll have to modify the filepaths within
 the `httpd.conf` and `.htaccess` files to match your directory structure.
 
-To run the web server:
-
+Within the rubyserver/ directory, to run the web server:
 ```
-ruby rubyserver/server.rb
+ruby server.rb
 ```
 Then in a browser enter:
 ```
