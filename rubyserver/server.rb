@@ -29,7 +29,7 @@ class Webserver
   end
   
   def read_config_file
-    @httpd_config = HttpConfig.new(File.open("config/httpd_luis.conf", "r").read())
+    @httpd_config = HttpConfig.new(File.open("config/httpd.conf", "r").read())
     @mime_types = MimeTypes.new(File.open("config/mime.types", "r").read()).load
   end
   
