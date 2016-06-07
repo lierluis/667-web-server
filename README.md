@@ -19,7 +19,7 @@ Then in a browser enter:
 localhost:port/file_path
 ```
 Where `port` is an arbitrarily chosen port number specified within the `httpd.conf` file,
-and file_path is a file or directory within the server's filepath, e.g. `chomp.gif`.
+and `file_path` is a file or directory within the server's filepath, e.g. `chomp.gif`.
 
 To access files within the protected directory, use these credentials:
 ```
@@ -27,5 +27,5 @@ username: luis
 password: estrada
 ```
 
-Known issues:
+##### Known issues:
 * Doesn't work well with Chromium browser on Ubuntu (use Mozilla Firefox instead)
