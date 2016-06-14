@@ -4,7 +4,8 @@ Web server written in Ruby that serves static resources.
 
 Responds to local HTTP requests with status codes 200, 201, 204, 400, 401, 403, 404, and 500.
 
-Documentation: https://docs.google.com/document/d/1ze8yF1-jbCxfrrQZVcLtrHyFYKSKanyWG1k4zNmgqeg/edit?usp=sharing
+See the documentation
+<a href="https://docs.google.com/document/d/1ze8yF1-jbCxfrrQZVcLtrHyFYKSKanyWG1k4zNmgqeg/edit?usp=sharing">here</a>.
 
 ## Getting Started
 
