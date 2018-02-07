@@ -1,11 +1,13 @@
-# CSC 667 Web Server Project
+# Web Server
 
-Web server written in Ruby that serves static resources.
+Multithreaded static web server written in Ruby, which was developed to learn
+about the HTTP protocol and the underpinnings of the Ruby on Rails framework.
+
+Creating a connection through sockets, the server reads and parses HTTP
+requests from a client, performs a series of operations, and returns an HTTP
+response with the appropriate status code and resource (if applicable).
 
 Responds to local HTTP requests with status codes 200, 201, 204, 400, 401, 403, 404, and 500.
-
-See the documentation
-<a href="https://docs.google.com/document/d/1ze8yF1-jbCxfrrQZVcLtrHyFYKSKanyWG1k4zNmgqeg/edit?usp=sharing">here</a>.
 
 ## Getting Started
 
@@ -28,6 +30,13 @@ To access files within the protected directory, use these credentials:
 username: luis
 password: estrada
 ```
+
+#### Technologies:
+* Ruby, HTML
+* Tools: Git, GitHub
+
+#### See more:
+* [Original documentation](https://goo.gl/0d0PWk)
 
 ##### Known issues:
 * Doesn't work well with the Chromium browser on Ubuntu (use Mozilla Firefox instead).
